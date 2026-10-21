@@ -1,0 +1,86 @@
+---
+// Home page hero carousel (21:9).
+// Crossfades every 5.5s (opacity 1.1s; each new slide scales 1.06 -> 1 over 6s).
+// Dots + prev/next buttons; any click restarts the 5.5s timer.
+// With "reduce motion" turned on, it does not auto-advance or animate.
+import { images } from '../data/site.js';
+const slides = images.slides;
+const pad = (n) => String(n).padStart(2, '0');
+---
+<div class="hero-carousel" data-carousel style="margin-top:clamp(36px,4vw,56px);position:relative;aspect-ratio:21/9;min-height:320px;overflow:hidden;background:#24272A" role="region" aria-roledescription="carousel" aria-label="Recent projects">
+  {slides.map((sl, i) => (
+    <img
+      src={sl.img}
+      alt={sl.label}
+      data-slide
+      loading={i === 0 ? 'eager' : 'lazy'}
+      fetchpriority={i === 0 ? 'high' : undefined}
+      aria-hidden={i === 0 ? undefined : 'true'}
+      style={`position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${i === 0 ? 1 : 0};transform:scale(${i === 0 ? 1 : 1.06});transition:opacity 1.1s ease, transform 6s ease-out`}
+    />
+  ))}
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:18px clamp(16px,2.4vw,28px);display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(23,25,27,0) 0%,rgba(23,25,27,0.85) 100%)">
+    <span aria-live="polite" style="font-weight:700;font-size:16px;color:#FFFFFF"><span data-num style="color:#C9A23A">01 / {pad(slides.length)}</span> <span data-label>{slides[0].label}</span></span>
+    <div style="display:flex;gap:8px;align-items:center">
+      {slides.map((sl, i) => (
+        <button type="button" data-dot aria-label={sl.label} aria-current={i === 0 ? 'true' : undefined} style={`width:${i === 0 ? '36px' : '12px'};height:6px;border:none;padding:0;cursor:pointer;background:${i === 0 ? '#C9A23A' : 'rgba(237,239,241,0.55)'};transition:width .4s ease, background .4s ease`}></button>
+      ))}
+      <button type="button" data-prev aria-label="Previous" style="margin-left:10px;width:44px;height:44px;border:1px solid rgba(237,239,241,0.6);background:transparent;color:#FFFFFF;font-size:20px;cursor:pointer">←</button>
+      <button type="button" data-next aria-label="Next" style="width:44px;height:44px;border:none;background:#C9A23A;color:#17191B;font-size:20px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('[data-carousel]');
+    if (!root) return;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var imgs = root.querySelectorAll('[data-slide]');
+    var dots = root.querySelectorAll('[data-dot]');
+    var num = root.querySelector('[data-num]');
+    var label = root.querySelector('[data-label]');
+    var total = imgs.length;
+    var cur = 0;
+    var timer = null;
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+
+    if (reduce) {
+      imgs.forEach(function (img) { img.style.transition = 'none'; img.style.transform = 'none'; });
+    }
+
+    function show(i) {
+      cur = (i + total) % total;
+      imgs.forEach(function (img, k) {
+        var on = k === cur;
+        img.style.opacity = on ? '1' : '0';
+        if (!reduce) img.style.transform = 'scale(' + (on ? 1 : 1.06) + ')';
+        if (on) img.removeAttribute('aria-hidden'); else img.setAttribute('aria-hidden', 'true');
+      });
+      dots.forEach(function (d, k) {
+        var on = k === cur;
+        d.style.width = on ? '36px' : '12px';
+        d.style.background = on ? '#C9A23A' : 'rgba(237,239,241,0.55)';
+        if (on) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      });
+      num.textContent = pad(cur + 1) + ' / ' + pad(total);
+      label.textContent = imgs[cur].alt;
+    }
+
+    // (Re)start the 5.5s auto-advance. Not started when reduce motion is on.
+    function startTimer() {
+      clearInterval(timer);
+      if (reduce) return;
+      timer = setInterval(function () { show(cur + 1); }, 5500);
+    }
+
+    // Any click picks a slide and resets the timer.
+    function pick(i) { show(i); startTimer(); }
+
+    dots.forEach(function (d, k) { d.addEventListener('click', function () { pick(k); }); });
+    root.querySelector('[data-prev]').addEventListener('click', function () { pick(cur - 1); });
+    root.querySelector('[data-next]').addEventListener('click', function () { pick(cur + 1); });
+
+    startTimer();
+  })();
+</script>

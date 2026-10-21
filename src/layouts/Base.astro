@@ -1,0 +1,159 @@
+---
+// Shared page shell: <head>, header, mobile menu, gold CTA band, footer and mobile bottom bar.
+// Business details come from src/data/site.js.
+import { site, images } from '../data/site.js';
+
+const { title, description, hideCta = false, ogImage = images.slides[0].img } = Astro.props;
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const tel = `tel:${site.phone.tel}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: site.legalName,
+  alternateName: site.name,
+  url: site.url,
+  telephone: site.phone.intl,
+  ...(site.email ? { email: site.email } : {}),
+  image: images.slides[0].img,
+  address: { '@type': 'PostalAddress', addressRegion: site.address.region, addressCountry: site.address.country },
+  areaServed: site.serviceAreas.map((name) => ({ '@type': 'City', name })),
+  sameAs: [site.links.instagram, site.links.facebook, site.links.yelp],
+};
+---
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={site.name} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#17191B" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script src="/motion.js" is:inline defer></script>
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" style="position:sticky;top:0;z-index:40;background:#17191B;color:#EDEFF1">
+  <div style="max-width:1440px;margin:0 auto;padding:0 clamp(20px,4vw,56px);height:84px;display:flex;align-items:center;gap:36px">
+    <a href="/" class="logo" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:#EDEFF1;margin-right:auto;min-width:0;white-space:nowrap" aria-label="Budget Aluminium home">
+      <span style="display:flex;flex-direction:column;gap:4px" aria-hidden="true"><span style="width:38px;height:5px;background:#C9A23A"></span><span style="width:38px;height:5px;background:#C9A23A"></span><span style="width:38px;height:5px;background:#C9A23A"></span><span style="width:38px;height:5px;background:#C9A23A"></span></span>
+      <span style="display:flex;flex-direction:column;line-height:1;white-space:nowrap;min-width:0">
+        <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(20px,5.6vw,25px);letter-spacing:-0.02em">Budget Aluminium</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:0.22em;color:#C9A23A;margin-top:4px">AND ALLIED WORLD LTD.</span>
+      </span>
+    </a>
+    <nav class="desktop-only" style="gap:30px;align-items:center" aria-label="Main">
+      {site.nav.map((n) => (
+        <a href={n.href} aria-current={path === n.href ? 'page' : undefined} style={`font-weight:600;font-size:16px;color:${path === n.href ? '#C9A23A' : '#EDEFF1'};text-decoration:none`}>{n.label}</a>
+      ))}
+    </nav>
+    <a href={tel} class="desktop-only" style="font-weight:700;font-size:17px;color:#EDEFF1;text-decoration:none;white-space:nowrap">{site.phone.display}</a>
+    <a href="/contact" class="desktop-only btn-gold" style="font-size:16px;padding:15px 24px">Book a Free Estimate</a>
+    <button type="button" class="mobile-only menu-toggle" aria-expanded="false" aria-controls="mobile-menu" style="background:#C9A23A;border:none;color:#17191B;font-weight:700;font-size:16px;padding:12px 18px;cursor:pointer">Menu</button>
+  </div>
+  <div id="mobile-menu" class="mobile-menu" hidden style="padding:8px 20px 32px;flex-direction:column">
+    {site.nav.map((n) => (
+      <a href={n.href} style="color:#EDEFF1;text-decoration:none;font-family:'Sora',sans-serif;font-weight:800;font-size:42px;letter-spacing:-0.03em;line-height:1.2">{n.label}</a>
+    ))}
+    <a href={tel} style="color:#C9A23A;font-weight:700;font-size:20px;margin-top:20px;text-decoration:none">Call {site.phone.display}</a>
+  </div>
+</header>
+
+<slot />
+
+{!hideCta && (
+  <section style="background:#C9A23A;color:#17191B">
+    <div style="max-width:1440px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4vw,56px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:32px 64px">
+      <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(46px,6vw,108px);line-height:0.92;letter-spacing:-0.05em;margin:0;max-width:10em">Get a price on your patio cover this week.</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="/contact" style="background:#17191B;color:#EDEFF1;font-weight:700;font-size:18px;padding:19px 30px;text-decoration:none;white-space:nowrap">Book a Free Estimate</a>
+        <a href={tel} style="border:2px solid #17191B;color:#17191B;font-weight:700;font-size:18px;padding:17px 28px;text-decoration:none;white-space:nowrap">{site.phone.display}</a>
+      </div>
+    </div>
+  </section>
+)}
+
+<footer style="background:#0F1012;color:#A9AEB3">
+  <div style="max-width:1440px;margin:0 auto;padding:56px clamp(20px,4vw,56px) 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:28px 56px;font-size:16px">
+    <div><span style="display:block;font-family:'Sora',sans-serif;font-weight:800;font-size:24px;letter-spacing:-0.02em;color:#EDEFF1">{site.name}</span>and Allied World Ltd.</div>
+    <div style="display:flex;flex-direction:column;gap:6px"><a href={tel} style="color:#FFFFFF;font-weight:700;text-decoration:none">{site.phone.display}</a><a href={site.links.financeit} target="_blank" rel="noopener" style="color:#A9AEB3">Payment plans</a>{site.email && <a href={`mailto:${site.email}`} style="color:#A9AEB3">{site.email}</a>}</div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span>WCB / WorkSafe BC</span><span>Best Businesses in Canada 2022</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px 16px"><a href={site.links.instagram} target="_blank" rel="noopener" style="color:#A9AEB3">Instagram</a><a href={site.links.facebook} target="_blank" rel="noopener" style="color:#A9AEB3">Facebook</a><a href={site.links.yelp} target="_blank" rel="noopener" style="color:#A9AEB3">Yelp</a></div>
+  </div>
+  <div style="max-width:1440px;margin:0 auto;padding:16px clamp(20px,4vw,56px) 28px;font-size:14px;color:#7A7F84">© 2026 Budget Aluminium and Allied World Ltd.</div>
+  <div class="mobile-only" style="height:66px"></div>
+</footer>
+
+<div class="mobile-only bottom-bar" style="position:fixed;left:0;right:0;bottom:0;z-index:50;grid-template-columns:1fr 1fr">
+  <a href={tel} style="background:#17191B;color:#EDEFF1;font-weight:700;font-size:17px;text-align:center;padding:20px 8px;text-decoration:none">Call now</a>
+  <a href="/contact" style="background:#C9A23A;color:#17191B;font-weight:700;font-size:17px;text-align:center;padding:20px 8px;text-decoration:none">Free Estimate</a>
+</div>
+
+</div>
+
+<script is:inline>
+  // Mobile menu toggle (Menu / Close).
+  (function () {
+    var btn = document.querySelector('.menu-toggle');
+    var menu = document.getElementById('mobile-menu');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () {
+      var open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+
+<style is:global>
+  html, body { margin: 0; padding: 0; background: #D7DADD; color: #17191B; }
+  * { box-sizing: border-box; }
+  a { color: #7A5F14; text-underline-offset: 4px; }
+  a:hover { color: #17191B; }
+  img { display: block; }
+  [hidden] { display: none !important; }
+  input, select, textarea, button { font-family: inherit; }
+
+  .page { font-family: 'Inter Tight', system-ui, sans-serif; font-size: 18px; line-height: 1.6; color: #17191B; background: #D7DADD; min-height: 100vh; }
+
+  /* Buttons that change on hover (style-hover in the prototype). */
+  a.btn-gold { background: #C9A23A; color: #17191B; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  a.btn-gold:hover { background: #DDB84E; color: #17191B; }
+  a.btn-outline-light { border: 2px solid #EDEFF1; color: #EDEFF1; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  a.btn-outline-light:hover { background: #EDEFF1; color: #17191B; }
+  button.btn-submit { background: #17191B; color: #EDEFF1; font-weight: 700; font-size: 18px; padding: 19px 34px; border: none; cursor: pointer; }
+  button.btn-submit:hover { background: #7A5F14; }
+  button.btn-submit:disabled { opacity: .7; cursor: wait; }
+
+  /* Desktop (1140px and up): full nav. Below 1140px: Menu button + sticky bottom bar. */
+  .desktop-only { display: flex; }
+  .mobile-only, .mobile-menu { display: none !important; }
+  @media (max-width: 1139.98px) {
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
+    .bottom-bar.mobile-only { display: grid !important; }
+    .mobile-menu:not([hidden]) { display: flex !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+</body>
+</html>

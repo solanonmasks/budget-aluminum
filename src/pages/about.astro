@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import { images } from '../data/site.js';
+---
+<Base
+  title="About | Budget Aluminium"
+  description="Premium results, budget prices. Budget Aluminium builds patio covers, railings, sunrooms, fences, decks and renovations from Richmond to Chilliwack."
+  ogImage={images.about.img}
+>
+<main>
+  <section style="max-width:1440px;margin:0 auto;padding:clamp(48px,6vw,96px) clamp(20px,4vw,56px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:40px 96px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <h1 style="font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-0.04em;font-size:clamp(52px,6.6vw,112px);line-height:0.92;margin:0">Premium results, <span style="color:#7A5F14">budget prices.</span></h1>
+      <p style="margin:0;font-size:20px">Budget Aluminium started with aluminium patio covers and deck building. Today we build covers, railings, sunrooms, fences, decks and full home renovations from Richmond to Chilliwack.</p>
+      <p style="margin:0;color:#3D4247">Rust-proof aluminium, tempered glass, wood and low-maintenance vinyl, designed for Surrey’s rain and Chilliwack’s snow. Every job starts with a free on-site estimate.</p>
+    </div>
+    <div style="aspect-ratio:4/3;overflow:hidden"><img src={images.about.img} alt={images.about.alt} loading="lazy" style="width:100%;height:100%;object-fit:cover" /></div>
+  </section>
+</main>
+</Base>
